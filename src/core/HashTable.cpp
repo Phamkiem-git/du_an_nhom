@@ -104,20 +104,56 @@ Contact* HashTable::find(const string& phone) {
 }
 
 bool HashTable::remove(const string& phone) {
-    // TODO (A): lượt (c)
+    int pos = hash1(phone);
+    int step = hash2(phone);
+
+    for (int k = 0; k < cap; k++) {
+        Slot& s = table[pos];
+        if (s.state == EMPTY) return false;          // gặp ô trống: không có khóa này
+        if (s.state == OCCUPIED && s.key == phone) {
+            s.state = DELETED;                       // đánh dấu đã xóa, giữ nguyên đường dò
+            s.contact = nullptr;
+            s.key = "";
+            count--;
+            deletedCount++;
+            return true;
+        }
+        pos = (pos + step) % cap;                    // DELETED hoặc khác khóa: dò tiếp
+    }
     return false;
 }
 
+
 void HashTable::rehash() {
-    // TODO (A): lượt (c)
+    Slot* oldTable = table;
+    int oldCap = cap;
+
+    cap = nextPrime(2 * oldCap);       // hash1, hash2 từ đây dùng cap MỚI
+    table = new Slot[cap];
+    count = 0;
+    deletedCount = 0;
+
+    for (int i = 0; i < oldCap; i++) {
+        if (oldTable[i].state != OCCUPIED) continue;   // bỏ qua ô EMPTY và DELETED
+
+        int pos = hash1(oldTable[i].key);
+        int step = hash2(oldTable[i].key);
+        while (table[pos].state != EMPTY) {
+            pos = (pos + step) % cap;
+        }
+        table[pos].key = oldTable[i].key;
+        table[pos].contact = oldTable[i].contact;
+        table[pos].state = OCCUPIED;
+        count++;
+    }
+    delete[] oldTable;
 }
 
 double HashTable::loadFactor() const {
-    // TODO (A): lượt (c)
-    return 0.0;
+    return (double)(count + deletedCount) / cap;
 }
 
 double HashTable::avgProbes() const {
-    // TODO (A): lượt (c)
-    return 0.0;
+    if (totalOps == 0) return 0.0;
+    return (double)totalProbes / totalOps;
 }

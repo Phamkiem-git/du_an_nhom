@@ -134,17 +134,105 @@ static void testHashTableInsertFind() {
     freeContact(nhieu);
 }
 
+// ---- Test HashTable, lượt (c): remove, rehash, loadFactor, avgProbes ----
+// So sánh hai số thực: coi là bằng nhau nếu chênh lệch rất nhỏ.
+static bool near(double a, double b) {
+    return a - b < 1e-9 && b - a < 1e-9;
+}
+
+static void testHashTableRemoveRehash() {
+    Contact* an = createContact("An", "", GROUP_FRIEND);
+    Contact* binh = createContact("Binh", "", GROUP_FAMILY);
+
+    // --- remove ---
+    // Trong bảng 7 ô: 0901111111 ở ô 0; 0908888888 cũng bắt đầu ở ô 0 nên bị đẩy sang ô 6.
+    HashTable h(7);
+    h.insert("0901111111", an);
+    h.insert("0908888888", binh);
+    h.insert("0902222222", an);
+
+    check(h.remove("0901111111") == true, "xóa số đang có thành công");
+    check(h.size() == 2, "sau khi xóa, size giảm còn 2");
+    check(h.find("0901111111") == nullptr, "số đã xóa không còn tìm thấy");
+    check(h.find("0908888888") == binh, "số nằm SAU ô bị xóa trên đường dò vẫn tìm thấy (nhờ ô DELETED)");
+    check(h.remove("0901111111") == false, "xóa lần hai cùng số trả về false");
+    check(h.remove("0999999999") == false, "xóa số chưa từng có trả về false");
+
+    check(h.insert("0901111111", binh) == true, "thêm lại số vừa xóa thành công");
+    check(h.find("0901111111") == binh, "tìm thấy số vừa thêm lại");
+    check(h.size() == 3, "size trở lại 3");
+
+    // --- loadFactor ---
+    HashTable e(7);
+    check(near(e.loadFactor(), 0.0), "bảng rỗng có hệ số tải 0");
+    e.insert("0901111111", an);
+    e.insert("0908888888", binh);
+    e.insert("0902222222", an);
+    e.insert("0909999999", binh);
+    check(near(e.loadFactor(), 4.0 / 7), "4 phần tử trong 7 ô: hệ số tải 4/7");
+    e.remove("0901111111");
+    check(near(e.loadFactor(), 4.0 / 7), "xóa một phần tử: ô DELETED vẫn được tính, hệ số tải vẫn 4/7");
+
+    // --- avgProbes ---
+    HashTable p(7);
+    check(near(p.avgProbes(), 0.0), "chưa tra cứu lần nào thì số lần dò trung bình là 0");
+    p.insert("0901111111", an);      // ô 0
+    p.insert("0908888888", binh);    // ô 6 (bị đẩy từ ô 0)
+    p.find("0901111111");            // 1 lần dò: ô 0
+    p.find("0908888888");            // 2 lần dò: ô 0 rồi ô 6
+    p.find("0907777777");            // 2 lần dò: ô 6 rồi ô 4 (trống) -> không có
+    check(near(p.avgProbes(), 5.0 / 3), "3 lần tra cứu, tổng 5 lần dò: trung bình 5/3");
+
+    // --- rehash ---
+    HashTable g(7);
+    bool allInserted = true;
+    for (int i = 0; i < 30; i++) {
+        string key = "090000" + std::to_string(1000 + i);
+        if (!g.insert(key, an)) allInserted = false;
+    }
+    check(allInserted, "chèn 30 số vào bảng 7 ô đều thành công (bảng tự mở rộng)");
+    check(g.capacity() > 7, "kích thước bảng đã tăng");
+    check(g.size() == 30, "size = 30");
+    check(g.loadFactor() <= 0.7 + 1e-9, "hệ số tải không vượt 0,7");
+    bool allFound = true;
+    for (int i = 0; i < 30; i++) {
+        string key = "090000" + std::to_string(1000 + i);
+        if (g.find(key) != an) allFound = false;
+    }
+    check(allFound, "sau rehash, cả 30 số vẫn tìm thấy");
+
+    // rehash cũng dọn sạch ô DELETED
+    HashTable d(11);
+    for (int i = 1; i <= 7; i++) d.insert("090000000" + std::to_string(i), an);
+    d.remove("0900000001");
+    d.remove("0900000002");
+    d.remove("0900000003");
+    check(d.capacity() == 11, "chưa rehash: kích thước vẫn 11");
+    d.insert("0900000008", an);      // (4 + 3 + 1) / 11 > 0,7 nên rehash trước khi chèn
+    check(d.capacity() == 23, "đủ điều kiện thì rehash: 11 -> 23");
+    check(near(d.loadFactor(), 5.0 / 23), "sau rehash ô DELETED biến mất: hệ số tải = 5/23");
+    check(d.find("0900000004") == an && d.find("0900000008") == an && d.find("0900000002") == nullptr,
+          "sau rehash: số còn lại vẫn tìm thấy, số đã xóa vẫn không thấy");
+
+    // nhiều lần rehash liên tiếp
+    HashTable big(7);
+    for (int i = 0; i < 1000; i++) big.insert("0911" + std::to_string(100000 + i), binh);
+    bool ok1000 = (big.size() == 1000);
+    for (int i = 0; i < 1000; i++) {
+        if (big.find("0911" + std::to_string(100000 + i)) != binh) ok1000 = false;
+    }
+    check(ok1000, "chèn 1000 số (nhiều lần rehash), tìm lại đủ 1000 số");
+
+    freeContact(an);
+    freeContact(binh);
+}
+
 int main() {
     testPhoneList();
     testValidator();
     testHashTableCreate();
     testHashTableInsertFind();
-
-    // TODO (A): lượt (c): thêm test remove / rehash / loadFactor cho HashTable, ví dụ:
-    //   HashTable h(7);                                    // bảng nhỏ để dễ thấy đụng độ và rehash
-    //   check(h.insert("0901234567", c) == true,  "thêm số mới thành công");
-    //   check(h.insert("0901234567", c) == false, "thêm số trùng bị từ chối");
-    //   ... xóa rồi tìm, xóa rồi chèn lại, chèn nhiều số để kích hoạt rehash ...
+    testHashTableRemoveRehash();
 
     std::cout << (failed == 0 ? "Tất cả test đạt\n" : "Có test lỗi\n");
     return failed;
