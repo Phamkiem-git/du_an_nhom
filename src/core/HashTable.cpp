@@ -4,10 +4,18 @@
 // ============================================================
 #include "core/HashTable.h"
 
+static bool isPrime(int n) {
+    if (n < 2) return false;
+    for (int d = 2; d * d <= n; d++) {
+        if (n % d == 0) return false;
+    }
+    return true;
+}
+
 HashTable::HashTable(int initialSize)
     : table(nullptr), cap(0), count(0), deletedCount(0), totalProbes(0), totalOps(0) {
-    // TODO (A): cap = initialSize; table = new Slot[cap];
-    //   (Slot đã có constructor đặt state = EMPTY nên không cần vòng lặp khởi tạo.)
+    cap = nextPrime(initialSize);   // luôn dùng kích thước nguyên tố
+    table = new Slot[cap];  
 }
 
 HashTable::~HashTable() {
@@ -15,17 +23,24 @@ HashTable::~HashTable() {
 }
 
 int HashTable::hash1(const string& key) const {
-    // TODO (A): hàm băm Horner: h = h * 31 + (mã ký tự); nhớ lấy % cap để không tràn.
-    return 0;
+    long long h = 0;
+    for (int i = 0; i < (int)key.length(); i++) {
+        h = (h * 31 + (unsigned char)key[i]) % cap;
+    }
+    return (int)h;
 }
 
 int HashTable::hash2(const string& key) const {
-    // TODO (A): ví dụ 1 + (giá trị băm khác) % (cap - 1). Kết quả KHÔNG ĐƯỢC bằng 0.
-    return 1;
+    long long h = 0;
+    for (int i = 0; i < (int)key.length(); i++) {
+        h = (h * 131 + (unsigned char)key[i]) % (cap - 1);
+    }
+    return (int)h + 1;   // cộng 1 để chắc chắn khác 0
 }
 
 int HashTable::nextPrime(int n) {
-    // TODO (A): tăng n dần đến khi gặp số nguyên tố (kiểm tra chia thử đến căn n).
+    if (n < 2) n = 2;
+    while (!isPrime(n)) n++;
     return n;
 }
 
