@@ -80,12 +80,67 @@ static void testHashTableCreate() {
     check(h3.size() == 0, "bảng mới tạo chưa có phần tử nào");
 }
 
+// ---- Test HashTable, lượt (b): insert và find ----
+static void testHashTableInsertFind() {
+    Contact* an = createContact("An", "", GROUP_FRIEND);
+    Contact* binh = createContact("Binh", "", GROUP_FAMILY);
+
+    HashTable h(7);
+    check(h.find("0901234567") == nullptr, "bảng rỗng thì find trả về nullptr");
+
+    check(h.insert("0901234567", an) == true, "thêm số mới thành công");
+    check(h.size() == 1, "sau khi thêm, size = 1");
+    check(h.find("0901234567") == an, "find trả về đúng liên hệ vừa thêm");
+    check(h.find("0999999999") == nullptr, "find số chưa thêm trả về nullptr");
+
+    check(h.insert("0901234567", binh) == false, "thêm số trùng bị từ chối");
+    check(h.size() == 1, "thêm trùng không làm tăng size");
+    check(h.find("0901234567") == an, "thêm trùng không ghi đè liên hệ cũ");
+
+    // Bốn số dưới đây đã được kiểm tra bằng tay: trong bảng 7 ô, 0901111111 và 0908888888
+    // cùng bắt đầu ở ô 0; 0902222222 và 0909999999 cùng bắt đầu ở ô 1 -> có đụng độ.
+    HashTable g(7);
+    check(g.insert("0901111111", an), "chèn số thứ nhất (ô 0)");
+    check(g.insert("0908888888", binh), "chèn số đụng độ với số thứ nhất");
+    check(g.insert("0902222222", an), "chèn số thứ ba (ô 1)");
+    check(g.insert("0909999999", binh), "chèn số đụng độ với số thứ ba");
+    check(g.find("0901111111") == an, "tìm lại số thứ nhất");
+    check(g.find("0908888888") == binh, "tìm lại số đụng độ thứ nhất (phải dò thêm)");
+    check(g.find("0902222222") == an, "tìm lại số thứ ba");
+    check(g.find("0909999999") == binh, "tìm lại số đụng độ thứ ba (phải dò thêm)");
+    check(g.find("0907777777") == nullptr, "số chưa thêm vẫn trả về nullptr dù bảng có đụng độ");
+
+    // Nhiều phần tử trong bảng lớn hơn (60/101 < 0,7 nên chưa cần rehash)
+    Contact* nhieu = createContact("Nhieu", "", GROUP_WORK);
+    HashTable big(101);
+    bool allInserted = true;
+    for (int i = 0; i < 60; i++) {
+        string key = "090000" + std::to_string(1000 + i);
+        if (!big.insert(key, nhieu)) allInserted = false;
+    }
+    check(allInserted, "chèn 60 số khác nhau đều thành công");
+    check(big.size() == 60, "size = 60 sau khi chèn 60 số");
+
+    bool allFound = true;
+    for (int i = 0; i < 60; i++) {
+        string key = "090000" + std::to_string(1000 + i);
+        if (big.find(key) != nhieu) allFound = false;
+    }
+    check(allFound, "tìm lại được cả 60 số");
+    check(big.find("0900009999") == nullptr, "số chưa chèn trả về nullptr");
+
+    freeContact(an);
+    freeContact(binh);
+    freeContact(nhieu);
+}
+
 int main() {
     testPhoneList();
     testValidator();
     testHashTableCreate();
+    testHashTableInsertFind();
 
-    // TODO (A): lượt (b), (c): thêm test insert / find / remove / rehash cho HashTable, ví dụ:
+    // TODO (A): lượt (c): thêm test remove / rehash / loadFactor cho HashTable, ví dụ:
     //   HashTable h(7);                                    // bảng nhỏ để dễ thấy đụng độ và rehash
     //   check(h.insert("0901234567", c) == true,  "thêm số mới thành công");
     //   check(h.insert("0901234567", c) == false, "thêm số trùng bị từ chối");
