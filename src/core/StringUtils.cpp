@@ -5,37 +5,120 @@
 #include "core/StringUtils.h"
 
 string toLower(const string& s) {
-    // TODO (B): sao chép s, đổi mỗi ký tự 'A'..'Z' thành chữ thường (cộng 'a' - 'A').
-    return s;
+    string result =  s;
+    for (size_t i = 0; i < result.length(); i++) {
+        if (result[i] >= 'A' && result[i] <= 'Z') {
+            result[i] = result[i] + ('a' - 'A');
+        }
+    }
+    return result;
+
 }
 
 string trim(const string& s) {
-    // TODO (B): tìm vị trí ký tự khác ' ' đầu tiên và cuối cùng rồi dùng s.substr(...).
-    return s;
+    int left = 0;
+    int right = s.length() - 1;
+
+    while (left <= right && s[left] == ' ')
+        left++;
+
+    while (right >= left && s[right] == ' ')
+        right--;
+
+    if (left > right) 
+        return "";
+
+    return s.substr(left, right - left + 1);
+
 }
 
 bool startsWith(const string& s, const string& prefix) {
-    // TODO (B): nếu prefix dài hơn s thì false; ngược lại so sánh từng ký tự (sau khi toLower).
-    return false;
+    string str  = toLower(s);
+    string pre = toLower(prefix);
+    if (pre.length() > str.length())
+        return false;
+    
+    for (size_t i = 0; i < pre.length(); i++) {
+        if (str[i] != pre[i]) 
+            return false;
+    }
+    return true;
 }
 
 int compareNames(const string& a, const string& b) {
-    // TODO (B): toLower cả hai rồi so sánh từng ký tự; ký tự khác nhau đầu tiên quyết định kết quả;
-    //   nếu một chuỗi là tiền tố của chuỗi kia thì chuỗi ngắn hơn đứng trước.
+    string s1 = toLower(a);
+    string s2 = toLower(b);
+
+    int n;
+    
+    if (s1.length() < s2.length())
+        n = s1.length();
+    else
+        n = s2.length();
+
+    for (int i = 0; i < n; i++) {
+        unsigned char c1 = (unsigned char)s1[i];
+        unsigned char c2 = (unsigned char)s2[i];
+
+        if (c1 < c2)
+            return -1;
+
+        if (c1 > c2)
+            return 1;
+    }
+    if (s1.length() < s2.length())
+        return -1;
+
+    if (s1.length() > s2.length())
+        return 1;
+
     return 0;
+   
 }
 
-int indexOf(const string& s, char c, int from) {
-    // TODO (B): vòng lặp từ from đến hết chuỗi, gặp c thì trả về chỉ số; không gặp trả về -1.
+int indexOf(const string& s, char c, int from ) {
+    for ( size_t i = from; i < s.length(); i++) {
+        if (s[i] == c)
+            return i;
+    }
     return -1;
 }
 
 bool isValidName(const string& name) {
-    // TODO (B): xem mô tả trong StringUtils.h.
-    return false;
+    string s = trim(name);
+
+    if (s.empty())
+        return false;
+    
+    for (size_t i = 0; i < s.length(); i++) {
+        if (s[i] == '|')
+            return false;
+    }
+
+    return true;
 }
 
 bool isValidEmail(const string& email) {
-    // TODO (B): xem mô tả trong StringUtils.h.
-    return false;
+    if (email.empty())
+        return true;
+
+    int countAt = 0;
+    int atPos = -1;
+
+    for (size_t i = 0; i < email.length(); i++) {
+        if (email[i] == '@') {
+            countAt++;
+            atPos = i;
+        }
+    }
+
+    if (countAt != 1)
+        return false;
+    if (atPos == 0)
+        return false;
+
+    if (atPos == email.length() - 1)
+        return false;
+
+    return true;
 }
