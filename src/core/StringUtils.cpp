@@ -15,14 +15,19 @@ string toLower(const string& s) {
 
 }
 
+// Ký tự được coi là khoảng trắng: dấu cách, tab, và \r \n (tệp Windows kết thúc dòng bằng \r\n)
+static bool isSpace(char c) {
+    return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
 string trim(const string& s) {
     int left = 0;
     int right = s.length() - 1;
 
-    while (left <= right && s[left] == ' ')
+    while (left <= right && isSpace(s[left]))
         left++;
 
-    while (right >= left && s[right] == ' ')
+    while (right >= left && isSpace(s[right]))
         right--;
 
     if (left > right) 
@@ -117,7 +122,7 @@ bool isValidEmail(const string& email) {
     if (atPos == 0)
         return false;
 
-    if (atPos == email.length() - 1)
+    if (atPos == (int)email.length() - 1)
         return false;
 
     return true;
