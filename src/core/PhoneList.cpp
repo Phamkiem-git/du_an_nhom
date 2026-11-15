@@ -1,32 +1,55 @@
-// ============================================================
-// File      : src/core/PhoneList.cpp
-// Phụ trách : THÀNH VIÊN A
-// ============================================================
 #include "core/PhoneList.h"
 
+// Thêm số vào ĐẦU danh sách.
 void addPhone(Contact* c, const string& number) {
-    // TODO (A): tạo PhoneNode mới bằng new, gắn vào danh sách c->phones.
-    //   Gợi ý: thêm vào đầu danh sách là đơn giản nhất.
-    //   Nhớ xử lý trường hợp danh sách đang rỗng (c->phones == nullptr).
+    PhoneNode* node = new PhoneNode;   // 1. tạo nút mới trên heap
+    node->number = number;             // 2. ghi số vào nút
+    node->next = c->phones;            // 3. nút mới trỏ vào đầu cũ (rỗng thì là nullptr)
+    c->phones = node;                  // 4. đầu danh sách bây giờ là nút mới
 }
 
+// Xóa số khỏi danh sách. Trả về true nếu tìm thấy và đã xóa.
 bool removePhone(Contact* c, const string& number) {
-    // TODO (A): duyệt danh sách, tìm nút có number, nối nút trước với nút sau, delete nút đó.
-    //   Hai trường hợp cần tách riêng: xóa nút ĐẦU và xóa nút Ở GIỮA/CUỐI.
+    PhoneNode* prev = nullptr;         // nút đứng trước cur
+    PhoneNode* cur = c->phones;        // nút đang xét
+
+    while (cur != nullptr) {
+        if (cur->number == number) {
+            if (prev == nullptr) {
+                c->phones = cur->next;     // xóa nút ĐẦU
+            } else {
+                prev->next = cur->next;    // xóa nút giữa/cuối
+            }
+            delete cur;
+            return true;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
     return false;
 }
 
 bool hasPhone(const Contact* c, const string& number) {
-    // TODO (A): duyệt danh sách, so sánh từng number.
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        if (p->number == number) return true;
+    }
     return false;
 }
 
 int countPhones(const Contact* c) {
-    // TODO (A): duyệt danh sách và đếm.
-    return 0;
+    int count = 0;
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        count++;
+    }
+    return count;
 }
 
 void freePhones(Contact* c) {
-    // TODO (A): duyệt danh sách, delete từng nút (nhớ lưu con trỏ next TRƯỚC khi delete).
-    //   Cuối cùng đặt c->phones = nullptr.
+    PhoneNode* cur = c->phones;
+    while (cur != nullptr) {
+        PhoneNode* next = cur->next;   // LƯU nút kế tiếp TRƯỚC khi delete
+        delete cur;
+        cur = next;
+    }
+    c->phones = nullptr;
 }
