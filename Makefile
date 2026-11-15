@@ -2,7 +2,7 @@
 # Makefile - biên dịch toàn dự án (dùng được trên macOS và Linux)
 # Cách dùng:  make          -> build/danhba
 #             make run       -> biên dịch và chạy với data/contacts_sample.txt
-#             make test_hash / test_tree  -> chạy test riêng của A / B
+#             make test_hash / test_tree / test_book  -> chạy test của A / B / phần nối AddressBook
 #             make gen_data  -> sinh dữ liệu lớn (A)
 #             make exp_hash / exp_tree    -> thực nghiệm đo thời gian (A / B)
 #             make leaks     -> kiểm tra rò rỉ bộ nhớ trên macOS
@@ -17,7 +17,7 @@ CORE = src/core/Contact.cpp src/core/PhoneList.cpp src/core/HashTable.cpp \
        src/core/NameTree.cpp src/core/StringUtils.cpp src/core/Validator.cpp \
        src/core/AddressBook.cpp src/io/FileManager.cpp src/ui/Menu.cpp
 
-.PHONY: all run test_hash test_tree gen_data exp_hash exp_tree leaks clean
+.PHONY: all run test_hash test_tree test_book gen_data exp_hash exp_tree leaks clean
 
 all: build/danhba
 
@@ -39,6 +39,11 @@ build/test_tree: tests/test_tree.cpp $(CORE) | build
 	$(CXX) $(CXXFLAGS) $^ -o $@
 test_tree: build/test_tree
 	./build/test_tree
+
+build/test_book: tests/test_book.cpp $(CORE) | build
+	$(CXX) $(CXXFLAGS) $^ -o $@
+test_book: build/test_book
+	./build/test_book
 
 build/gen_data: tools/gen_data.cpp | build
 	$(CXX) $(CXXFLAGS) $^ -o $@

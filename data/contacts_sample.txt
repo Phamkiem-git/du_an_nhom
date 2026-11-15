@@ -1,0 +1,43 @@
+An|0901000001|an@gmail.com|FRIEND
+Anh|0901000002|anh@gmail.com|FRIEND
+Anh Tuan|0901000003|anhtuan@gmail.com|WORK
+An Nguyen|0901000004||FAMILY
+An Le|0901000005|anle@gmail.com|FRIEND
+
+Binh|0901000006|binh@gmail.com|FRIEND
+Binh Tran|0901000007|binhtran@gmail.com|WORK
+Binh Nguyen|0901000008||FAMILY
+
+Cuong|0901000009|cuong@gmail.com|WORK
+Cuong Le|0901000010|cuongle@gmail.com|WORK
+Cuong Tran|0901000011||FRIEND
+
+Dung|0901000012|dung@gmail.com|WORK
+Dung Nguyen|0901000013|dungn@gmail.com|FAMILY
+Dung Tran|0901000014||WORK
+
+Hoa|0901000015|hoa@gmail.com|FRIEND
+Hoa Nguyen|0901000016|hoan@gmail.com|FAMILY
+
+Lan|0901000017|lan@gmail.com|FAMILY
+Lan Anh|0901000018|lananh@gmail.com|FRIEND
+Lan Phuong|0901000019||WORK
+
+Minh|0901000020|minh@gmail.com|WORK
+Minh Anh|0901000021|minhanh@gmail.com|FRIEND
+Minh Duc|0901000022||FAMILY
+
+Nam|0901000023|nam@gmail.com|WORK
+Nam Tran|0901000024|namtran@gmail.com|WORK
+
+Ngoc|0901000025|ngoc@gmail.com|FRIEND
+Ngoc Anh|0901000026||FRIEND
+
+Phuong|0901000027|phuong@gmail.com|FAMILY
+Phuong Anh|0901000028|phuonganh@gmail.com|WORK
+
+Tuan|0901000029|tuan@gmail.com|WORK
+Tuan Anh|0901000030||FRIEND
+
+Van|0901000031|van@gmail.com|FAMILY
+Viet|0901000032|viet@gmail.com|WORK

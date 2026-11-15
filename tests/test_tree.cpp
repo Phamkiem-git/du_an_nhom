@@ -38,7 +38,7 @@ void testStringUtils() {
             "compareNames: Nam dung sau An");
       check(compareNames("AN", "an") == 0,
             "compareNames: khong phan biet hoa thuong");
-      (compareNames("An", "Anh") < 0,
+      check(compareNames("An", "Anh") < 0,
             "compareNames: tien to ngan hon");
 
       check(indexOf("abcde", 'c') == 2,

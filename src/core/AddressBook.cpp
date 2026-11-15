@@ -4,6 +4,7 @@
 // >>> FILE NỐI HAI PHẦN: gọi HashTable (A) và NameTree (B) <<<
 // ============================================================
 #include <iostream>
+#include <iomanip>
 #include "core/AddressBook.h"
 #include "core/PhoneList.h"
 #include "core/Validator.h"
@@ -20,41 +21,111 @@ AddressBook::~AddressBook() {
     // phoneIndex tự giải phóng mảng ô của nó; nó không sở hữu Contact.
 }
 
+// ---- Hàm trợ giúp (chỉ dùng trong file này) ----
+// c có đủ điều kiện để đưa vào danh bạ không? Kiểm tra: tên, email, nhóm,
+// có ít nhất một số, mỗi số hợp lệ, và không có số nào bị lặp ngay trong c.
+// (Chưa kiểm tra trùng với liên hệ khác: việc đó hỏi bảng băm và cây.)
+static bool isContactValid(const Contact* c) {
+    if (c == nullptr) return false;
+    if (!isValidName(c->name)) return false;
+    if (!isValidEmail(c->email)) return false;
+    if (!isValidGroup(c->group)) return false;
+    if (c->phones == nullptr) return false;           // phải có ít nhất một số
+
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        if (!isValidPhone(p->number)) return false;
+        for (const PhoneNode* q = p->next; q != nullptr; q = q->next) {
+            if (q->number == p->number) return false; // một số xuất hiện hai lần trong c
+        }
+    }
+    return true;
+}
+
+// Quy ước sở hữu: addContact trả false thì AddressBook CHƯA nhận c (người gọi tự freeContact).
 bool AddressBook::addContact(Contact* c) {
-    // TODO (A): theo thứ tự
-    //   1. c != nullptr; isValidName(c->name) [B]; isValidGroup(c->group); mỗi số isValidPhone().
-    //   2. Mỗi số trong c->phones: nếu phoneIndex.find(số) != nullptr -> trùng số -> return false.
-    //   3. Nếu nameIndex.find(c->name) != nullptr -> trùng tên -> return false.
-    //   4. CHỈ KHI cả hai kiểm tra đều qua: chèn từng số vào phoneIndex, rồi nameIndex.insert(c).
-    //      (Kiểm tra hết trước rồi mới chèn, để không phải hoàn tác khi chèn dở.)
-    return false;
+    // 1. Dữ liệu của c hợp lệ.
+    if (!isContactValid(c)) return false;
+
+    // 2. Không số nào của c đã có trong bảng băm.
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        if (phoneIndex.find(p->number) != nullptr) return false;
+    }
+
+    // 3. Tên chưa có trong cây.
+    if (nameIndex.find(c->name) != nullptr) return false;
+
+    // 4. Mọi kiểm tra đã qua: bây giờ mới chèn vào cả hai cấu trúc.
+    //    Không cần hoàn tác vì ở đây chèn không thể thất bại (đã chắc chắn không trùng).
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        phoneIndex.insert(p->number, c);
+    }
+    nameIndex.insert(c);
+    return true;
 }
 
 bool AddressBook::removeContact(const string& name) {
-    // TODO (A):
-    //   1. Contact* c = nameIndex.find(name); nếu nullptr -> return false.
-    //   2. Với mỗi số trong c->phones: phoneIndex.remove(số).
-    //   3. nameIndex.remove(name);   // chỉ gỡ nút khỏi cây, KHÔNG delete Contact
-    //   4. freeContact(c);           // giải phóng đúng một lần, ở đây
-    return false;
+    Contact* c = nameIndex.find(name);
+    if (c == nullptr) return false;
+
+    string key = c->name;     // chép tên ra trước, vì cuối hàm c sẽ bị giải phóng
+
+    // Gỡ mọi số khỏi bảng băm.
+    for (const PhoneNode* p = c->phones; p != nullptr; p = p->next) {
+        phoneIndex.remove(p->number);
+    }
+    // Gỡ nút khỏi cây (không delete Contact).
+    nameIndex.remove(key);
+    // Giải phóng Contact đúng một lần, ở đây.
+    freeContact(c);
+    return true;
 }
 
 bool AddressBook::addPhoneTo(const string& name, const string& phone) {
-    // TODO (A): tìm Contact theo tên; isValidPhone; phoneIndex.find(phone) phải là nullptr;
-    //   rồi addPhone(c, phone) và phoneIndex.insert(phone, c).
-    return false;
+    Contact* c = nameIndex.find(name);
+    if (c == nullptr) return false;
+    if (!isValidPhone(phone)) return false;
+
+    // insert trả false nếu số đã có trong bảng (thuộc bất kỳ liên hệ nào), nên không cần find riêng.
+    if (!phoneIndex.insert(phone, c)) return false;
+    addPhone(c, phone);
+    return true;
 }
 
 bool AddressBook::removePhoneFrom(const string& name, const string& phone) {
-    // TODO (A): tìm Contact; hasPhone(c, phone); phoneIndex.remove(phone); removePhone(c, phone).
-    return false;
+    Contact* c = nameIndex.find(name);
+    if (c == nullptr) return false;
+    if (!hasPhone(c, phone)) return false;
+    if (countPhones(c) <= 1) return false;   // mỗi liên hệ phải còn ít nhất một số
+
+    phoneIndex.remove(phone);
+    removePhone(c, phone);
+    return true;
 }
 
+// Quy ước: extra CHƯA nằm trong bảng băm hay cây. Thành công thì mergeInto đã free extra;
+// thất bại thì chưa free (Menu sẽ tự free), và existing không bị thay đổi gì.
 bool AddressBook::mergeInto(Contact* existing, Contact* extra) {
-    // TODO (A): với mỗi số của extra: nếu số đó đã thuộc liên hệ KHÁC thì từ chối (return false);
-    //   nếu không thì addPhone(existing, số) và phoneIndex.insert(số, existing).
-    //   Nếu existing->email rỗng thì lấy email của extra. Cuối cùng freeContact(extra).
-    return false;
+    if (existing == nullptr || extra == nullptr || existing == extra) return false;
+
+    // Pha 1: chỉ KIỂM TRA, chưa sửa gì. Số của extra không được thuộc về liên hệ KHÁC.
+    // (Số đã thuộc chính existing thì không sao, sẽ được bỏ qua ở pha 2.)
+    for (const PhoneNode* p = extra->phones; p != nullptr; p = p->next) {
+        if (!isValidPhone(p->number)) return false;
+        Contact* owner = phoneIndex.find(p->number);
+        if (owner != nullptr && owner != existing) return false;
+    }
+
+    // Pha 2: chuyển số sang existing.
+    for (const PhoneNode* p = extra->phones; p != nullptr; p = p->next) {
+        if (!hasPhone(existing, p->number)) {
+            phoneIndex.insert(p->number, existing);
+            addPhone(existing, p->number);
+        }
+    }
+    if (existing->email.empty()) existing->email = extra->email;
+
+    freeContact(extra);
+    return true;
 }
 
 // ---- Các hàm chuyển tiếp đơn giản (đã viết sẵn để làm mẫu cách hai phần nối nhau) ----
@@ -80,7 +151,14 @@ void AddressBook::searchPrefix(const string& prefix) {
 }
 
 void AddressBook::printStats() {
-    // TODO (A): in ra: số liên hệ, số khóa trong bảng băm, capacity, loadFactor(),
-    //   avgProbes(), và chiều cao cây tên (nameIndex.height()).
-    cout << "(printStats chưa cài đặt)\n";
+    cout << "\n===== THONG KE =====\n";
+    cout << "So lien he (nut cay)       : " << size() << "\n";
+    cout << "So khoa trong bang bam     : " << phoneIndex.size() << "\n";
+    cout << "Kich thuoc bang bam (cap)  : " << phoneIndex.capacity() << "\n";
+    cout << fixed << setprecision(3);
+    cout << "He so tai                  : " << phoneIndex.loadFactor() << "\n";
+    cout << "So lan do trung binh       : " << phoneIndex.avgProbes() << "\n";
+    cout.unsetf(ios::floatfield);
+    cout.precision(6);
+    cout << "Chieu cao cay ten          : " << nameIndex.height() << "\n";
 }
