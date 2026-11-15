@@ -9,6 +9,8 @@
 
 using namespace std;
 
+// printContact (hàm trợ giúp, chỉ dùng trong file này): in một liên hệ trên MỘT dòng:
+// tên, các số điện thoại (duyệt danh sách liên kết), email (nếu có) và nhóm. Bỏ qua nếu c rỗng.
 static void printContact(const Contact* c) {
     if (c == nullptr) return;
     cout << "- " << c->name << " | SDT: ";
@@ -31,12 +33,18 @@ static void printContact(const Contact* c) {
     cout << "\n";
 }
 
+// Hàm tạo: cây rỗng (root = nullptr, count = 0).
 NameTree::NameTree() : root(nullptr), count(0) {}
 
+// Hàm hủy: gọi destroyAll để giải phóng toàn bộ nút VÀ liên hệ khi đối tượng bị hủy.
 NameTree::~NameTree() {
     destroyAll();
 }
 
+
+// insert: thêm liên hệ c vào cây theo tên. Trả về false nếu c rỗng hoặc tên đã có
+// (so sánh không phân biệt hoa/thường); khi đó cây KHÔNG giữ c nên người gọi phải tự freeContact(c).
+// Độ phức tạp: trung bình O(log n), xấu nhất O(n).
 bool NameTree::insert(Contact* c) {
     if (c == nullptr) return false;
     bool inserted = false;
@@ -47,6 +55,10 @@ bool NameTree::insert(Contact* c) {
     return inserted;
 }
 
+
+// insertRec: hàm đệ quy của insert. Đi xuống theo compareNames (nhỏ hơn -> trái, lớn hơn -> phải)
+// đến chỗ trống thì tạo nút mới (inserted = true); gặp tên trùng thì giữ nguyên cây (inserted = false).
+// Trả về gốc của cây con sau khi chèn để nối lại con trỏ của nút cha.
 TreeNode* NameTree::insertRec(TreeNode* node, Contact* c, bool& inserted) {
     // 1. Đã tìm thấy vị trí trống -> tạo nút mới
     if (node == nullptr){
@@ -66,6 +78,9 @@ TreeNode* NameTree::insertRec(TreeNode* node, Contact* c, bool& inserted) {
     return node;
 }
 
+
+// find: tìm liên hệ theo tên đầy đủ (không phân biệt hoa/thường) bằng vòng lặp từ gốc đi xuống.
+// Trả về nullptr nếu không có. Trung bình O(log n), xấu nhất O(n).
 Contact* NameTree::find(const string& name) const {
     TreeNode* curr = root;
     while (curr != nullptr) {
@@ -81,6 +96,9 @@ Contact* NameTree::find(const string& name) const {
     return nullptr;
 }
 
+
+// remove: gỡ nút có tên name khỏi cây. Chỉ delete TreeNode, KHÔNG delete Contact
+// (AddressBook lo việc free). Trả về true nếu tìm thấy và gỡ được.
 bool NameTree::remove(const string& name) {
     bool removed = false;
     root = removeRec(root, name, removed);
@@ -90,6 +108,12 @@ bool NameTree::remove(const string& name) {
     return removed;
 }
 
+
+// removeRec: đệ quy tìm nút cần xóa rồi xử lý 3 trường hợp:
+//   (1) nút lá -> xóa nút; (2) chỉ có một con -> nối con đó lên thay chỗ;
+//   (3) có hai con -> tìm nút nhỏ nhất của cây con phải (nút kế thừa), chép CON TRỎ contact của nó
+//       lên nút hiện tại, rồi gỡ nút kế thừa khỏi cây con phải (cũng bằng removeRec).
+// Trả về gốc mới của cây con.
 TreeNode* NameTree::removeRec(TreeNode* node, const string& name, bool& removed) {
 
     if (node == nullptr) {
@@ -142,6 +166,8 @@ TreeNode* NameTree::removeRec(TreeNode* node, const string& name, bool& removed)
     return node;
 }
 
+
+// printInOrder: in toàn bộ danh bạ theo thứ tự chữ cái A-Z (duyệt LNR); cây rỗng thì báo danh bạ trống.
 void NameTree::printInOrder() const {
     if (root == nullptr) {
         cout<<"danh ba trong. \n";
@@ -150,6 +176,8 @@ void NameTree::printInOrder() const {
     inOrderRec(root);
 }
 
+
+// inOrderRec: duyệt trái -> nút -> phải. Vì là BST nên kết quả tự động đã sắp xếp theo tên.
 void NameTree::inOrderRec(const TreeNode* node) const {
     if (node == nullptr) return;
     inOrderRec(node->left);
@@ -157,10 +185,15 @@ void NameTree::inOrderRec(const TreeNode* node) const {
     inOrderRec(node->right);
 }
 
+
+// printByGroup: in các liên hệ thuộc nhóm group, theo thứ tự chữ cái.
 void NameTree::printByGroup(int group) const {
     groupRec(root, group);
 }
 
+
+// groupRec: duyệt LNR cả cây, chỉ in nút có contact->group == group.
+// Nhóm không liên quan đến thứ tự tên nên phải duyệt hết: O(n).
 void NameTree::groupRec(const TreeNode* node, int group) const {
     if (node == nullptr) return;
     groupRec(node->left, group);
@@ -170,11 +203,18 @@ void NameTree::groupRec(const TreeNode* node, int group) const {
     groupRec(node->right, group);
 }
 
+
+// searchPrefix: in các liên hệ có tên bắt đầu bằng prefix (không phân biệt hoa/thường).
+// Không có liên hệ nào khớp thì không in gì.
 void NameTree::searchPrefix(const string& prefix) const {
     prefixRec(root, prefix);
    
 }
 
+
+// prefixRec: duyệt có CẮT NHÁNH. Nút khớp tiền tố -> in nó và đi cả hai phía (theo thứ tự LNR).
+// Nút không khớp: nếu prefix đứng trước tên nút thì mọi tên bắt đầu bằng prefix chỉ có thể
+// nằm bên trái, ngược lại chỉ có thể nằm bên phải -> bỏ cả nhánh còn lại, không duyệt vô ích.
 void NameTree::prefixRec(const TreeNode* node, const string& prefix) const {
     if (node == nullptr) return;
 
@@ -194,11 +234,15 @@ void NameTree::prefixRec(const TreeNode* node, const string& prefix) const {
     }
 }
 
+
+// writeAll: ghi toàn bộ liên hệ ra luồng out theo thứ tự chữ cái (mỗi liên hệ một dòng), dùng khi lưu tệp.
 void NameTree::writeAll(ostream& out) const {
     writeRec(root, out);
     
 }
 
+
+// writeRec: duyệt LNR, mỗi nút gọi writeContactLine để ghi một dòng đúng định dạng tệp.
 void NameTree::writeRec(const TreeNode* node, ostream& out) const {
     if (node == nullptr) return;
     writeRec(node->left, out);
@@ -207,11 +251,14 @@ void NameTree::writeRec(const TreeNode* node, ostream& out) const {
    
 }
 
+// height: chiều cao cây (cây rỗng = 0, cây một nút = 1). Dùng trong thực nghiệm để xem cây có bị lệch không.
 int NameTree::height() const {
     return heightRec(root);
     
 }
 
+
+// heightRec: chiều cao = 1 + chiều cao lớn hơn trong hai cây con (cây rỗng = 0).
 int NameTree::heightRec(const TreeNode* node) const {
     if (node == nullptr) return 0;
     
@@ -222,6 +269,8 @@ int NameTree::heightRec(const TreeNode* node) const {
 
 }
 
+
+// destroyAll: giải phóng toàn bộ nút và Contact rồi đặt lại cây rỗng; gọi nhiều lần vẫn an toàn.
 void NameTree::destroyAll() {
     destroyRec(root);
     root = nullptr;
@@ -229,6 +278,9 @@ void NameTree::destroyAll() {
   
 }
 
+
+// destroyRec: duyệt hậu thứ tự (trái, phải, rồi mới tới nút): phải giải phóng con trước nút cha.
+// Mỗi nút: freeContact rồi delete nút.
 void NameTree::destroyRec(TreeNode* node) {
     if (node == nullptr) return;
 

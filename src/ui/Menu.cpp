@@ -14,6 +14,9 @@ using namespace std;
 // ------------------------------------------------------------
 // Nhập liệu an toàn
 // ------------------------------------------------------------
+// readInt: nhập một số nguyên trong khoảng [lo, hi], lặp lại đến khi hợp lệ.
+// Nhập chữ (cin.fail) hoặc ngoài khoảng thì báo lỗi và hỏi lại; phần ký tự thừa sau số bị bỏ qua.
+// Hết dữ liệu nhập (EOF) thì trả về lo để chương trình thoát êm thay vì lặp vô hạn.
 int readInt(const string& prompt, int lo, int hi) {
     int value;
 
@@ -45,6 +48,8 @@ int readInt(const string& prompt, int lo, int hi) {
     }
 }
 
+// readLine: in lời nhắc rồi đọc nguyên một dòng (có thể chứa dấu cách);
+// hết dữ liệu nhập thì trả về chuỗi rỗng.
 string readLine(const string& prompt) {
     string s;
     cout << prompt;
@@ -55,6 +60,7 @@ string readLine(const string& prompt) {
 // ------------------------------------------------------------
 // Hàm trợ giúp hiển thị (chỉ dùng trong file này)
 // ------------------------------------------------------------
+// groupName: đổi mã nhóm (0/1/2) thành chữ để hiển thị; mã lạ trả về "Khac".
 static string groupName(int group) {
     if (group == GROUP_FAMILY) return "Gia dinh";
     if (group == GROUP_FRIEND) return "Ban be";
@@ -199,9 +205,11 @@ static void editContactUI(AddressBook& book) {
         int choice = readInt("Chon: ", 0, 4);
 
         switch (choice) {
+        // 0: Kết thúc sửa, quay về menu chính.
         case 0:
             return;
 
+        // 1: Đổi email (để trống = xóa email; email sai thì giữ nguyên).
         case 1: {
             string email = trim(readLine("Email moi (de trong de xoa email): "));
             if (isValidEmail(email)) {
@@ -213,11 +221,13 @@ static void editContactUI(AddressBook& book) {
             break;
         }
 
+        // 2: Đổi nhóm (readInt bảo đảm giá trị 0..2).
         case 2:
             c->group = readInt("Nhom moi (0 = Gia dinh, 1 = Ban be, 2 = Cong viec): ", 0, 2);
             cout << "Da cap nhat nhom.\n";
             break;
 
+        // 3: Thêm số: kiểm tra hợp lệ và chưa thuộc liên hệ nào, rồi đi qua book.addPhoneTo.
         case 3: {
             string phone = trim(readLine("So dien thoai can them: "));
             if (!isValidPhone(phone)) {
@@ -235,6 +245,7 @@ static void editContactUI(AddressBook& book) {
             break;
         }
 
+        // 4: Xóa số: phải có trong liên hệ và không phải số cuối cùng, rồi đi qua book.removePhoneFrom.
         case 4: {
             string phone = trim(readLine("So dien thoai can xoa: "));
             if (!hasPhone(c, phone)) {
@@ -255,6 +266,8 @@ static void editContactUI(AddressBook& book) {
 // ------------------------------------------------------------
 // Vòng lặp menu chính
 // ------------------------------------------------------------
+// runMenu: vòng lặp menu chính: in menu -> readInt (0..9) -> switch gọi chức năng, đến khi chọn 0.
+// Mọi thao tác thêm/xóa/tra cứu đều đi qua AddressBook; Menu không gọi trực tiếp HashTable hay NameTree.
 void runMenu(AddressBook& book) {
 
     while (true) {
@@ -276,18 +289,22 @@ void runMenu(AddressBook& book) {
 
         switch (choice) {
 
+        // 0: Thoát vòng lặp; main sẽ ghi tệp rồi kết thúc.
         case 0:
             cout << "Hen gap lai!\n";
             return;
 
+        // 1: Thêm liên hệ mới (addContactUI).
         case 1:
             addContactUI(book);
             break;
 
+        // 2: Sửa liên hệ (editContactUI).
         case 2:
             editContactUI(book);
             break;
 
+        // 3: Xóa liên hệ theo tên: book.removeContact.
         case 3: {
             string name = readLine("Nhap ten can xoa: ");
 
@@ -299,6 +316,7 @@ void runMenu(AddressBook& book) {
             break;
         }
 
+        // 4: Tra theo số điện thoại: book.findByPhone (bảng băm).
         case 4: {
             string phone = trim(readLine("Nhap so dien thoai: "));
 
@@ -314,6 +332,7 @@ void runMenu(AddressBook& book) {
             break;
         }
 
+        // 5: Tra theo tên đầy đủ: book.findByName (cây BST).
         case 5: {
             string name = trim(readLine("Nhap ten can tim: "));
 
@@ -329,17 +348,20 @@ void runMenu(AddressBook& book) {
             break;
         }
 
+        // 6: Tìm theo tiền tố tên: book.searchPrefix (cây BST, có cắt nhánh).
         case 6: {
             string prefix = trim(readLine("Nhap tien to: "));
             book.searchPrefix(prefix);
             break;
         }
 
+        // 7: In danh bạ A-Z: book.printAll (duyệt LNR).
         case 7:
             cout << "\n===== DANH BA A-Z =====\n";
             book.printAll();
             break;
 
+        // 8: In theo nhóm: chọn nhóm 0..2 rồi gọi book.printByGroup.
         case 8: {
             cout << "0. Gia dinh\n";
             cout << "1. Ban be\n";
@@ -352,6 +374,7 @@ void runMenu(AddressBook& book) {
             break;
         }
 
+        // 9: Thống kê bảng băm: book.printStats (phần của A).
         case 9:
             cout << "\n===== THONG KE =====\n";
             book.printStats();

@@ -4,6 +4,10 @@
 // ============================================================
 #include "core/StringUtils.h"
 
+
+// toLower: trả về BẢN SAO của s với các chữ cái ASCII A-Z đổi thành a-z; ký tự khác
+// (kể cả chữ có dấu tiếng Việt) giữ nguyên. Dùng để so sánh tên không phân biệt hoa/thường.
+// Độ phức tạp O(độ dài chuỗi).
 string toLower(const string& s) {
     string result =  s;
     for (size_t i = 0; i < result.length(); i++) {
@@ -15,11 +19,16 @@ string toLower(const string& s) {
 
 }
 
-// Ký tự được coi là khoảng trắng: dấu cách, tab, và \r \n (tệp Windows kết thúc dòng bằng \r\n)
+
+// isSpace (hàm trợ giúp của trim): true với dấu cách, tab, '\r' và '\n'.
+// ('\r' hay còn sót ở cuối dòng khi đọc tệp tạo trên Windows.)
 static bool isSpace(char c) {
     return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
+
+// trim: cắt các ký tự khoảng trắng (theo isSpace) ở đầu và cuối chuỗi: "  An  " -> "An".
+// Chuỗi rỗng hoặc toàn khoảng trắng -> "". left và right là chỉ số ký tự đầu và cuối phần được giữ lại.
 string trim(const string& s) {
     int left = 0;
     int right = s.length() - 1;
@@ -37,6 +46,9 @@ string trim(const string& s) {
 
 }
 
+
+// startsWith: true nếu s bắt đầu bằng prefix, không phân biệt hoa/thường (so sánh sau khi toLower).
+// prefix dài hơn s thì false; prefix rỗng thì luôn true. Dùng cho tìm theo tiền tố tên.
 bool startsWith(const string& s, const string& prefix) {
     string str  = toLower(s);
     string pre = toLower(prefix);
@@ -50,6 +62,12 @@ bool startsWith(const string& s, const string& prefix) {
     return true;
 }
 
+
+// compareNames: so sánh hai tên theo thứ tự chữ cái, không phân biệt hoa/thường (qua toLower).
+// Trả về -1 nếu a đứng trước b, 1 nếu a đứng sau b, 0 nếu bằng nhau.
+// Đây là hàm quyết định thứ tự trong cây BST: hai tên so ra 0 được coi là TRÙNG.
+// So từng byte (ép sang unsigned char); nếu một chuỗi là tiền tố của chuỗi kia thì chuỗi ngắn
+// hơn đứng trước ("An" < "Anh").
 int compareNames(const string& a, const string& b) {
     string s1 = toLower(a);
     string s2 = toLower(b);
@@ -81,6 +99,8 @@ int compareNames(const string& a, const string& b) {
    
 }
 
+// indexOf: trả về vị trí đầu tiên của ký tự c trong s, bắt đầu tìm từ vị trí from (mặc định 0);
+// không thấy thì trả về -1. Dùng để tách dòng tệp theo '|' và ',' trong FileManager.
 int indexOf(const string& s, char c, int from ) {
     for ( size_t i = from; i < s.length(); i++) {
         if (s[i] == c)
@@ -89,6 +109,9 @@ int indexOf(const string& s, char c, int from ) {
     return -1;
 }
 
+
+// isValidName: hợp lệ khi sau trim không rỗng và không chứa '|'
+// ('|' là ký tự phân cách các trường trong tệp dữ liệu).
 bool isValidName(const string& name) {
     string s = trim(name);
 
@@ -103,6 +126,9 @@ bool isValidName(const string& name) {
     return true;
 }
 
+
+// isValidEmail: email rỗng là hợp lệ (được bỏ trống). Nếu có thì chỉ kiểm tra đúng một '@'
+// và có ít nhất một ký tự ở mỗi phía của '@'; không kiểm tra phần tên miền.
 bool isValidEmail(const string& email) {
     if (email.empty())
         return true;

@@ -12,7 +12,13 @@
 
 using namespace std;
 
+// parseContactLine: chuyển MỘT dòng tệp dạng "tên|số1,số2|email|nhóm" thành Contact mới (createContact).
+// Trả về nullptr nếu dòng có ít hơn 3 dấu '|', tên rỗng, hoặc nhóm rỗng / chứa ký tự không phải chữ số.
+// Hàm KHÔNG kiểm tra số điện thoại, email hay miền giá trị của nhóm: phần đó AddressBook::addContact lo.
+// Contact trả về chưa thuộc danh bạ: người gọi phải thêm vào book hoặc freeContact.
 Contact* parseContactLine(const string& line) {
+    // Tìm ba dấu '|' đầu tiên để cắt dòng thành 4 trường: tên | các số | email | nhóm.
+    // Mọi thứ sau dấu '|' thứ ba được coi là trường nhóm.
     int p1 = indexOf(line, '|');
     if (p1 == -1) return nullptr;
 
@@ -36,6 +42,8 @@ Contact* parseContactLine(const string& line) {
     if (name.empty())
         return nullptr;
 
+    // Đổi chuỗi nhóm sang số nguyên bằng tay: mỗi chữ số làm group = group * 10 + chữ số;
+    // gặp ký tự không phải chữ số thì trả về nullptr.
     int group = 0;
 
     if (groupStr.empty())
@@ -48,8 +56,11 @@ Contact* parseContactLine(const string& line) {
         group = group * 10 + (groupStr[i] - '0');
     }
 
+    // Các kiểm tra định dạng ở trên đã qua (đủ 4 trường, tên không rỗng, nhóm là số) nên mới cấp phát
+    // Contact; nhờ vậy các lần return nullptr phía trên không gây rò rỉ bộ nhớ.
     Contact* c = createContact(name, email, group);
 
+    // Tách chuỗi số theo dấu ',': mỗi số được trim, số rỗng bị bỏ qua, rồi thêm vào danh sách liên kết bằng addPhone.
     int start = 0;
 
     while (true) {
@@ -79,6 +90,11 @@ Contact* parseContactLine(const string& line) {
    
 }
 
+
+// loadContacts: đọc tệp path theo từng dòng và thêm các liên hệ vào book.
+// Dòng trống và dòng bắt đầu bằng '#' (sau khi trim) bị bỏ qua. Dòng sai định dạng hoặc bị book từ chối
+// (trùng số/tên, dữ liệu không hợp lệ...) chỉ in cảnh báo kèm số dòng rồi đọc tiếp, không dừng chương trình.
+// Trả về false nếu không mở được tệp, ngược lại trả về true.
 bool loadContacts(AddressBook& book, const string& path) {
     ifstream in(path);
 
@@ -91,6 +107,7 @@ bool loadContacts(AddressBook& book, const string& path) {
     while (getline(in, line)) {
         lineNo++;
 
+        // Cắt khoảng trắng (kể cả '\r' cuối dòng của tệp Windows) trước khi xử lý.
         string s = trim(line);
 
         if (s.empty())
@@ -107,7 +124,7 @@ bool loadContacts(AddressBook& book, const string& path) {
                  << " sai dinh dang.\n";
             continue;
         }
-
+        // book từ chối thì Contact chưa thuộc ai -> phải freeContact để không rò rỉ bộ nhớ.
         if (!book.addContact(c)) {
             cout << "Canh bao: khong the them lien he o dong "
                  << lineNo
@@ -121,6 +138,9 @@ bool loadContacts(AddressBook& book, const string& path) {
     
 }
 
+
+// writeContactLine: ghi một liên hệ ra out theo định dạng "tên|số1,số2|email|nhóm" rồi xuống dòng.
+// Email rỗng thì để trống giữa hai dấu '|'. NameTree::writeAll gọi hàm này cho từng nút.
 void writeContactLine(ostream& out, const Contact* c) {
     if (c == nullptr)
         return;
@@ -149,6 +169,9 @@ void writeContactLine(ostream& out, const Contact* c) {
    
 }
 
+
+// saveContacts: ghi toàn bộ danh bạ ra tệp path (ghi đè), theo thứ tự chữ cái nhờ duyệt cây tên.
+// Trả về false nếu không mở được tệp.
 bool saveContacts(const AddressBook& book, const string& path) {
      ofstream out(path);
 
