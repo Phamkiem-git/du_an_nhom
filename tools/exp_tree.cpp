@@ -1,15 +1,3 @@
-// ============================================================
-// File      : tools/exp_tree.cpp
-// Phụ trách : THÀNH VIÊN B
-// Vai trò   : Thực nghiệm cho báo cáo (phần cây BST):
-//             so sánh chiều cao và thời gian chèn / tìm tên khi nhập tên theo thứ tự
-//             NGẪU NHIÊN và theo thứ tự ĐÃ SẮP XẾP (dữ liệu đã sắp xếp làm BST thành
-//             "cái que": chiều cao = n, mỗi thao tác tốn O(n)).
-// Chạy      : make exp_tree
-// Ghi chú   : - Dùng rand() để xáo trộn thứ tự (không phải cấu trúc dữ liệu) và <chrono>
-//               qua Timer.h để đo thời gian. Nên ghi chú điều này vào báo cáo.
-//             - Không dùng vector/map/sort: mảng chỉ số cấp phát bằng new[] / delete[].
-// ============================================================
 #include <iostream>
 #include <cstdlib>      // rand, srand
 #include "core/NameTree.h"
