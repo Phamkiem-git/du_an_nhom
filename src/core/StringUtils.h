@@ -1,9 +1,3 @@
-// ============================================================
-// File      : src/core/StringUtils.h
-// Phụ trách : THÀNH VIÊN B
-// Review    : thành viên A
-// Vai trò   : Các hàm xử lý chuỗi tự viết (không dùng std::find / <algorithm>).
-// ============================================================
 #ifndef STRINGUTILS_H
 #define STRINGUTILS_H
 

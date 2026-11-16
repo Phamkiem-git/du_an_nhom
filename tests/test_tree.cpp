@@ -1,9 +1,3 @@
-// ============================================================
-// File      : tests/test_tree.cpp
-// Phụ trách : THÀNH VIÊN B
-// Vai trò   : Test RIÊNG cho StringUtils + NameTree, không cần chờ phần của A.
-// Chạy      : make test_tree
-// ============================================================
 #include <iostream>
 #include "core/Contact.h"
 #include "core/NameTree.h"

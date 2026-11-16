@@ -1,7 +1,3 @@
-// ============================================================
-// File      : src/io/FileManager.cpp
-// Phụ trách : THÀNH VIÊN B
-// ============================================================
 #include <fstream>
 #include <iostream>
 #include "io/FileManager.h"

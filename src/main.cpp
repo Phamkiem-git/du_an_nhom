@@ -1,8 +1,4 @@
-// ============================================================
-// File      : src/main.cpp
-// Phụ trách : THÀNH VIÊN B (A đọc để nắm luồng chạy của cả chương trình)
 // Luồng     : đọc tệp -> chạy menu -> ghi tệp -> thoát (AddressBook tự giải phóng bộ nhớ).
-// ============================================================
 #include <iostream>
 #include "core/AddressBook.h"
 #include "io/FileManager.h"

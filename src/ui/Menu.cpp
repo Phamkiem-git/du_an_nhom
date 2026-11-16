@@ -1,7 +1,3 @@
-// ============================================================
-// File      : src/ui/Menu.cpp
-// Phụ trách : THÀNH VIÊN B
-// ============================================================
 #include <iostream>
 #include <limits>
 #include "ui/Menu.h"

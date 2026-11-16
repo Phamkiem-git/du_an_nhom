@@ -1,10 +1,4 @@
-// ============================================================
-// File      : src/ui/Menu.h
-// Phụ trách : THÀNH VIÊN B
-// Review    : thành viên A
-// Vai trò   : Giao diện console: in menu, đọc lựa chọn, nhập dữ liệu an toàn.
-//             Chỉ làm việc với AddressBook, không đụng trực tiếp vào HashTable/NameTree.
-// ============================================================
+
 #ifndef MENU_H
 #define MENU_H
 

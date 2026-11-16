@@ -1,7 +1,3 @@
-// ============================================================
-// File      : src/core/NameTree.cpp
-// Phụ trách : THÀNH VIÊN B
-// ============================================================
 #include <iostream>
 #include "core/NameTree.h"
 #include "core/StringUtils.h"

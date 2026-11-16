@@ -1,13 +1,4 @@
-// ============================================================
-// File      : src/core/NameTree.h
-// Phụ trách : THÀNH VIÊN B
-// Review    : thành viên A
-// Vai trò   : Cây tìm kiếm nhị phân (BST) khóa = tên liên hệ.
-//             Dùng để in theo thứ tự chữ cái, tìm theo tên, tìm theo tiền tố.
-// Quy ước   : Cây KHÔNG cho hai Contact trùng tên (trùng tên thì gộp, do AddressBook lo).
-//             Cây sở hữu các TreeNode; các Contact được giải phóng bởi destroyAll()
-//             (khi tắt chương trình) hoặc bởi AddressBook::removeContact (khi xóa một liên hệ).
-// ============================================================
+
 #ifndef NAMETREE_H
 #define NAMETREE_H
 
