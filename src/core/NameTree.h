@@ -19,6 +19,7 @@ public:
     ~NameTree();
 
     // Thêm c theo c->name. Trả về false nếu tên đã có (so sánh bằng compareNames).
+    // hoa/thường và dấu tiếng Việt, nên "Nguyễn An" và "nguyen an" là cùng một tên).
     bool insert(Contact* c);
 
     // Tìm theo tên đầy đủ. Trả về nullptr nếu không có.
@@ -40,6 +41,9 @@ public:
     // Ghi mọi liên hệ ra out theo thứ tự chữ cái, mỗi liên hệ một dòng (gọi writeContactLine trong FileManager).
     void writeAll(std::ostream& out) const;
 
+    // [NÂNG CAO] Ghi mọi liên hệ ra out dạng CSV theo thứ tự chữ cái (gọi writeCsvLine trong FileManager).
+    void writeAllCsv(std::ostream& out) const;
+
     int size() const { return count; }
     int height() const;               // chiều cao cây (cây rỗng = 0)
 
@@ -57,6 +61,7 @@ private:
     void groupRec(const TreeNode* node, int group) const;
     void prefixRec(const TreeNode* node, const string& prefix) const;
     void writeRec(const TreeNode* node, std::ostream& out) const;
+    void writeCsvRec(const TreeNode* node, std::ostream& out) const;
     int  heightRec(const TreeNode* node) const;
     void destroyRec(TreeNode* node);
 

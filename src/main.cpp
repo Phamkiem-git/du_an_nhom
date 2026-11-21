@@ -1,5 +1,8 @@
 // Luồng     : đọc tệp -> chạy menu -> ghi tệp -> thoát (AddressBook tự giải phóng bộ nhớ).
 #include <iostream>
+#ifdef _WIN32
+#include <windows.h>   // SetConsoleOutputCP: để console Windows hiện/nhập được chữ tiếng Việt UTF-8
+#endif
 #include "core/AddressBook.h"
 #include "io/FileManager.h"
 #include "ui/Menu.h"
@@ -8,6 +11,12 @@ using namespace std;
 
 // main: điểm vào chương trình. Luồng: đọc tệp -> chạy menu -> ghi tệp -> thoát.
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+    // [NÂNG CAO] Tên có dấu được lưu UTF-8: chuyển console sang UTF-8 để in và gõ đúng chữ có dấu.
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     // Đường dẫn tệp dữ liệu: lấy từ tham số dòng lệnh đầu tiên nếu có, không thì dùng data/contacts_sample.txt.
     string path = (argc > 1) ? argv[1] : "data/contacts_sample.txt";
 

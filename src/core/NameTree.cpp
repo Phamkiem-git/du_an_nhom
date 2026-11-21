@@ -247,6 +247,21 @@ void NameTree::writeRec(const TreeNode* node, ostream& out) const {
    
 }
 
+// writeAllCsv: giống writeAll nhưng mỗi liên hệ được ghi thành một dòng CSV (nhập/xuất CSV - phần nâng cao).
+void NameTree::writeAllCsv(ostream& out) const {
+    writeCsvRec(root, out);
+}
+
+
+// writeCsvRec: duyệt LNR, mỗi nút gọi writeCsvLine để ghi một dòng CSV.
+void NameTree::writeCsvRec(const TreeNode* node, ostream& out) const {
+    if (node == nullptr) return;
+    writeCsvRec(node->left, out);
+    writeCsvLine(out, node->contact);
+    writeCsvRec(node->right, out);
+}
+
+
 // height: chiều cao cây (cây rỗng = 0, cây một nút = 1). Dùng trong thực nghiệm để xem cây có bị lệch không.
 int NameTree::height() const {
     return heightRec(root);

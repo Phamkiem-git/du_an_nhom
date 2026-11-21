@@ -10,12 +10,20 @@ string toLower(const string& s);
 // Bỏ khoảng trắng ở đầu và cuối chuỗi.
 string trim(const string& s);
 
+// [NÂNG CAO] Bỏ dấu tiếng Việt (chuỗi UTF-8), giữ nguyên hoa/thường:
+//   "Nguyễn Văn Đức" -> "Nguyen Van Duc".  Ký tự không phải chữ tiếng Việt giữ nguyên.
+string removeDiacritics(const string& s);
+
 // s có bắt đầu bằng prefix không? (so sánh KHÔNG phân biệt hoa thường)
 bool startsWith(const string& s, const string& prefix);
 
 // So sánh hai tên KHÔNG phân biệt hoa thường: <0 nếu a đứng trước b, 0 nếu bằng, >0 nếu a đứng sau b.
 // Đây là hàm quyết định thứ tự trong cây BST.
 int compareNames(const string& a, const string& b);
+
+// [NÂNG CAO] Bỏ 3 byte BOM của UTF-8 (EF BB BF) ở đầu s nếu có.
+// Notepad/Excel trên Windows hay thêm BOM vào đầu tệp UTF-8.
+void stripBom(string& s);
 
 // Vị trí đầu tiên của ký tự c trong s, bắt đầu tìm từ vị trí from. Trả về -1 nếu không có.
 // Dùng khi tách dòng trong tệp theo ký tự '|' và ','.
