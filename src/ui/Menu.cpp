@@ -337,13 +337,13 @@ void runMenu(AddressBook& book) {
 
             Contact* c = book.findByName(name);
 
-            if (c == nullptr) {
-                cout << "Khong tim thay lien he!\n";
-            } else {
+            if (c != nullptr) {
                 cout << "Tim thay:\n";
                 showContact(c);
+            } else {
+                cout << "Khong co ten trung khop hoan toan, thu tim theo tien to:\n";
+                book.searchPrefix(name);
             }
-
             break;
         }
 

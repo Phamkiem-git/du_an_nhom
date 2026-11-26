@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 #endif
-
     // Đường dẫn tệp dữ liệu: lấy từ tham số dòng lệnh đầu tiên nếu có, không thì dùng data/contacts_sample.txt.
     string path = (argc > 1) ? argv[1] : "data/contacts_sample.txt";
 
