@@ -284,7 +284,7 @@ void runMenu(AddressBook& book) {
         cout << "11. Xuat danh ba ra tep CSV\n";
         cout << "0. Thoat\n";
 
-        int choice = readInt("Chon chuc nang: ", 0, 9);
+        int choice = readInt("Chon chuc nang: ", 0, 11);
 
         switch (choice) {
 
