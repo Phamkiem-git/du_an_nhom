@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include "ui/Menu.h"
+#include "io/FileManager.h"
 #include "core/StringUtils.h"
 #include "core/PhoneList.h"
 #include "core/Validator.h"
@@ -279,6 +280,8 @@ void runMenu(AddressBook& book) {
         cout << "7. In danh ba A-Z\n";
         cout << "8. In theo nhom\n";
         cout << "9. Thong ke\n";
+        cout << "10. Nhap danh ba tu tep CSV\n";
+        cout << "11. Xuat danh ba ra tep CSV\n";
         cout << "0. Thoat\n";
 
         int choice = readInt("Chon chuc nang: ", 0, 9);
@@ -375,6 +378,35 @@ void runMenu(AddressBook& book) {
             cout << "\n===== THONG KE =====\n";
             book.printStats();
             break;
+
+         // 10: [NÂNG CAO] Nhập danh bạ từ tệp CSV vào danh bạ hiện tại (liên hệ trùng số/tên bị bỏ qua).
+        case 10: {
+            string path = trim(readLine("Duong dan tep CSV can nhap (de trong de huy): "));
+            if (path.empty()) {
+                cout << "Da huy.\n";
+                break;
+            }
+            int added = 0, skipped = 0;
+            if (importCsv(book, path, added, skipped))
+                cout << "Da them " << added << " lien he, bo qua " << skipped << " dong.\n";
+            else
+                cout << "Khong mo duoc tep " << path << "\n";
+            break;
+        }
+
+        // 11: [NÂNG CAO] Xuất toàn bộ danh bạ ra tệp CSV (ghi đè nếu tệp đã có).
+        case 11: {
+            string path = trim(readLine("Duong dan tep CSV can xuat (de trong de huy): "));
+            if (path.empty()) {
+                cout << "Da huy.\n";
+                break;
+            }
+            if (exportCsv(book, path))
+                cout << "Da xuat " << book.size() << " lien he ra " << path << "\n";
+            else
+                cout << "Khong ghi duoc tep " << path << "\n";
+            break;
+        }
         }
     }
 }

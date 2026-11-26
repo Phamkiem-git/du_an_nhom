@@ -1,0 +1,17 @@
+# Du lieu mau co dau tieng Viet (UTF-8) de thu tim kiem khong phan biet dau.
+# Dinh dang: Ho ten|so1,so2|email|nhom (0 gia dinh, 1 ban be, 2 cong viec)
+Nguyễn Văn An|0901100001,0912100001|an.nguyen@mail.com|1
+Nguyễn Thị Bình|0901100002|binh.nguyen@mail.com|0
+Nguyễn Hoàng Cường|0901100003||2
+Nguyen Minh Khoa|0901100004|khoa@mail.com|1
+Đặng Thị Hương|0901100005,0912100005|huong.dang@mail.com|0
+Đỗ Minh Đức|0901100006|duc.do@mail.com|2
+Đào Thanh Tùng|0901100007||1
+Lê Hoàng Cường|0901100008|cuong.le@mail.com|2
+Lê Thị Ánh Ngọc|0901100009|ngoc.le@mail.com|0
+Trần Thị Ánh Tuyết|0901100010,0912100010|tuyet.tran@mail.com|1
+Phạm Quỳnh Anh|0901100011|quynhanh@mail.com|1
+Phan Văn Ân|0901100012|an.phan@mail.com|2
+Ông Thị Ỷ Lan|0901100013||0
+Vũ Đức Huy|0901100014|huy.vu@mail.com|2
+Hoàng Thùy Dương|0901100015|duong.hoang@mail.com|1
